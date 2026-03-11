@@ -136,6 +136,72 @@ body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono',
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
 @media (max-width: 600px) { .gr-grid { grid-template-columns: 1fr; } .gp-weeks { flex-direction: column; } .gp-week { border-right: 1px solid var(--border) !important; border-bottom: none; border-radius: 0 !important; } .gp-week:first-child { border-radius: 8px 8px 0 0 !important; } .gp-week:last-child { border-radius: 0 0 8px 8px !important; border-bottom: 1px solid var(--border) !important; } }
+
+/* ── Sync Bar ── */
+.sync-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 20px;
+  background: rgba(167,139,250,0.04);
+  border: 1px solid rgba(167,139,250,0.14);
+  border-radius: 10px;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+.sync-label { font-size: 9px; color: var(--w2); letter-spacing: 0.14em; text-transform: uppercase; margin-right: 4px; flex-shrink: 0; }
+.sync-divider { width: 1px; height: 20px; background: rgba(255,255,255,0.07); flex-shrink: 0; }
+.sync-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 13px; border-radius: 6px; cursor: pointer;
+  font-size: 11px; font-family: 'JetBrains Mono', monospace;
+  border: 1px solid; transition: all 0.18s; flex-shrink: 0;
+}
+.sync-btn-export {
+  background: rgba(167,139,250,0.08); border-color: rgba(167,139,250,0.25); color: var(--w2);
+}
+.sync-btn-export:hover { background: rgba(167,139,250,0.16); }
+.sync-btn-import {
+  background: rgba(56,189,248,0.07); border-color: rgba(56,189,248,0.2); color: var(--w1);
+}
+.sync-btn-import:hover { background: rgba(56,189,248,0.14); }
+.sync-hint { font-size: 10px; color: #334; font-style: italic; flex: 1; min-width: 160px; }
+.sync-toast {
+  font-size: 10px; padding: 4px 10px; border-radius: 4px;
+  background: rgba(52,211,153,0.12); border: 1px solid rgba(52,211,153,0.25);
+  color: var(--success); display: none;
+}
+.sync-toast.show { display: block; }
+
+/* Modal */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.75); z-index: 100;
+  align-items: center; justify-content: center; padding: 20px;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: #0d1117; border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px; padding: 28px; width: 100%; max-width: 520px;
+  font-family: 'JetBrains Mono', monospace;
+}
+.modal-title { font-family: 'Cormorant Garamond', serif; font-size: 20px; color: #eef2f8; margin-bottom: 6px; }
+.modal-desc { font-size: 11px; color: #445; margin-bottom: 16px; line-height: 1.6; }
+.modal-code {
+  width: 100%; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px; padding: 12px 14px; color: #8899aa; font-size: 11px;
+  font-family: 'JetBrains Mono', monospace; resize: none; outline: none;
+  line-height: 1.5; min-height: 80px;
+}
+.modal-actions { display: flex; gap: 10px; margin-top: 14px; justify-content: flex-end; }
+.modal-btn {
+  padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 11px;
+  font-family: 'JetBrains Mono', monospace; border: 1px solid; transition: all 0.15s;
+}
+.modal-btn-primary { background: rgba(167,139,250,0.12); border-color: rgba(167,139,250,0.3); color: var(--w2); }
+.modal-btn-primary:hover { background: rgba(167,139,250,0.22); }
+.modal-btn-secondary { background: transparent; border-color: rgba(255,255,255,0.08); color: #445; }
+.modal-btn-secondary:hover { color: #667; }
+.modal-error { font-size: 10.5px; color: var(--w3); margin-top: 8px; display: none; }
+.modal-error.show { display: block; }
 </style>
 </head>
 <body>
@@ -149,6 +215,48 @@ body { background: var(--bg); color: var(--text); font-family: 'JetBrains Mono',
     <span class="outcome-tag blue">Goal 1 — Expert-level prompting on demand</span>
     <span class="outcome-tag purple">Goal 2 — Build AI tools others can use</span>
     <span class="outcome-tag orange">Deliverable — KPI Tracker + Personal Productivity Tool</span>
+  </div>
+</div>
+
+<div class="sync-bar">
+  <span class="sync-label">⇄ Sync</span>
+  <div class="sync-divider"></div>
+  <button class="sync-btn sync-btn-export" onclick="openExport()">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 1v7M2 5.5l3.5 3.5 3.5-3.5M1 9.5h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Export progress
+  </button>
+  <button class="sync-btn sync-btn-import" onclick="openImport()">
+    <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M5.5 8V1M2 4.5L5.5 1 9 4.5M1 9.5h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Import progress
+  </button>
+  <span class="sync-hint">Switch between MacBook and iMac without losing progress</span>
+  <span class="sync-toast" id="sync-toast">✓ Progress imported successfully</span>
+</div>
+
+<!-- Export Modal -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal">
+    <div class="modal-title serif">Export Your Progress</div>
+    <div class="modal-desc">Copy this code and save it somewhere accessible from both machines — a note, iMessage to yourself, or iCloud Note. Paste it into the Import screen on your other device.</div>
+    <textarea class="modal-code" id="export-code" readonly rows="4"></textarea>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-secondary" onclick="closeModals()">Close</button>
+      <button class="modal-btn modal-btn-primary" onclick="copyExportCode()">Copy code</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <div class="modal-title serif">Import Progress</div>
+    <div class="modal-desc">Paste the export code from your other device below. This will replace the current progress on this machine.</div>
+    <textarea class="modal-code" id="import-code" placeholder="Paste your export code here…" rows="4"></textarea>
+    <div class="modal-error" id="import-error">⚠ Invalid code — make sure you copied the full export string</div>
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-secondary" onclick="closeModals()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="doImport()">Import & apply</button>
+    </div>
   </div>
 </div>
 
@@ -500,6 +608,50 @@ function render(){
 
   document.getElementById("status-pre").textContent=generatePrompt();
 }
+// ── Sync: Export / Import ──
+function openExport(){
+  const code = btoa(JSON.stringify(state));
+  document.getElementById("export-code").value = code;
+  document.getElementById("export-modal").classList.add("open");
+}
+function openImport(){
+  document.getElementById("import-code").value = "";
+  document.getElementById("import-error").classList.remove("show");
+  document.getElementById("import-modal").classList.add("open");
+}
+function closeModals(){
+  document.getElementById("export-modal").classList.remove("open");
+  document.getElementById("import-modal").classList.remove("open");
+}
+function copyExportCode(){
+  const code = document.getElementById("export-code").value;
+  navigator.clipboard.writeText(code).then(()=>{
+    const btn = event.target;
+    btn.textContent = "✓ Copied!";
+    setTimeout(()=>{ btn.textContent = "Copy code"; }, 2000);
+  });
+}
+function doImport(){
+  const raw = document.getElementById("import-code").value.trim();
+  try {
+    const parsed = JSON.parse(atob(raw));
+    if(typeof parsed !== "object" || !parsed.completed) throw new Error("bad");
+    state = parsed;
+    saveState();
+    closeModals();
+    render();
+    const toast = document.getElementById("sync-toast");
+    toast.classList.add("show");
+    setTimeout(()=> toast.classList.remove("show"), 3000);
+  } catch(e) {
+    document.getElementById("import-error").classList.add("show");
+  }
+}
+// Close modal on overlay click
+document.addEventListener("click", e=>{
+  if(e.target.classList.contains("modal-overlay")) closeModals();
+});
+
 loadState(); render();
 </script>
 </body>
